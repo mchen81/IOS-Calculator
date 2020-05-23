@@ -11,34 +11,8 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var displayNumber: UILabel!
-    
-    enum NumberMode {
-        case FIRST_NUMBER
-        case OPERATING_NUMBER
-        case EQUAL
-    }
-    
-    enum Operator{
-        case NUL
-        case ADD
-        case SUB
-        case MUL
-        case DIV
-    }
-    
-    let MAX_LENGTH = 10;
-    
-    var numberMode = NumberMode.FIRST_NUMBER;
-    
-    var boadrNumber:String = "";
-    
-    var result:Double = 0.0
-    var input:Double = 0.0
-    
-    var isFloatValue:Bool  = false
-    var decimalPlace:Double = 10.0
-    var oper = Operator.NUL
-    
+    @IBOutlet weak var no: UILabel!
+    @IBOutlet weak var total: UILabel!
     
     @IBAction func sevenPressed(_ sender: UIButton) {
         numberPreesed(digital: 7)
@@ -80,127 +54,75 @@ class ViewController: UIViewController {
         numberPreesed(digital: 0)
     }
     
-
-    @IBAction func dividePressed(_ sender: UIButton) {
-        operatoerPressed(ope: Operator.DIV)
-    }
     
-    @IBAction func multiplyPressed(_ sender: UIButton) {
-        operatoerPressed(ope: Operator.MUL)
-    }
+    var count:Float = 1;
+    var sum:Float = 0;
+    var boardNumber: String = "";
     
-    @IBAction func subPreesed(_ sender: UIButton) {
-        operatoerPressed(ope: Operator.SUB)
-    }
     
-    @IBAction func addPreesed(_ sender: UIButton){
-        operatoerPressed(ope: Operator.ADD)
+    @IBAction func nextPressed(_ sender: UIButton) {
+        let num = Float(boardNumber) ?? 0
+        sum += num
+        count = count + 1
+        boardNumber = "0"
+        updateBoard()
     }
     
     
-    @IBAction func percentagePressed(_ sender: UIButton) {
-        numberMode = NumberMode.OPERATING_NUMBER
-        input = 100;
-        oper = Operator.MUL
-        calculateNumber()
-    }
-    
-    
-    @IBAction func equalPressed(_ sender: UIButton){
-        calculateNumber();
-    }
-    
-    func calculateNumber(){
+    @IBAction func averagePressed(_ sender: UIButton) {
         
-        print("Operater: \(oper), Result: \(result), Input: \(input)")
-        
-        switch oper {
-        case Operator.ADD:
-            result += input
-        case Operator.SUB:
-            result -= input
-        case Operator.MUL:
-            result *= input
-        case Operator.DIV:
-            result /= input
-        default:
-            return
-        }
-        
-        oper = Operator.NUL
-        numberMode = NumberMode.EQUAL
-        boadrNumber = String(format: "%.6f", result)
-        updateBoardNumber()
-        boadrNumber = ""
-        
-        
-    }
-    
-    
-    @IBAction func pointPressed(_ sender: UIButton) {
-        if(isFloatValue){
-            return
-        }
-        
-        isFloatValue = true;
-        boadrNumber =  boadrNumber + "."
-        updateBoardNumber()
-    }
-    
-    @IBAction func acPressed(_ sender: UIButton) {
-        reset()
-    }
-    
-    
-    func numberPreesed(digital : Int){
-        if(numberMode == NumberMode.EQUAL){
-            reset()
-            numberMode = NumberMode.FIRST_NUMBER
-        }
-        
-        if(boadrNumber.count >= MAX_LENGTH){
-            return
-        }
-    
-        if(isFloatValue){
-            let n = Double(digital) / decimalPlace;
-            decimalPlace *= 10;
-            input += n;
+        if(boardNumber != "0"){
+            sum += Float(boardNumber) ?? 0
         }else{
-            input = input * 10 + Double(digital);
+            count = count - 1
         }
         
-        if(numberMode == NumberMode.FIRST_NUMBER){
-            result = input;
+        let avg:Float = sum / count;
+        boardNumber = String(format: "%.2f", avg)
+        displayNumber.text = boardNumber;
+        total.text = String(format: "Total: %d", Int(sum))
+        no.text = "Count:\(Int(count))"
+    }
+    
+    @IBAction func resetPressed(_ sender: UIButton) {
+        reset()
+        updateBoard()
+    }
+    
+    
+    @IBAction func cancelCurrentPressed(_ sender: UIButton) {
+        boardNumber = "0"
+        updateBoard()
+    }
+    
+    func numberPreesed(digital: Int){
+        if boardNumber == "0" && digital == 0{
+            return
         }
         
-        boadrNumber =  boadrNumber + String(digital)
-        updateBoardNumber()
+        if boardNumber == "0"{
+            boardNumber = ""
+        }
+        
+        boardNumber = boardNumber + String(digital)
+        updateBoard()
     }
     
-    func operatoerPressed(ope : Operator){
-        oper = ope
-        input = 0
-        numberMode = NumberMode.OPERATING_NUMBER
-        boadrNumber = ""
-        isFloatValue  = false
-        decimalPlace = 10.0
-    }
     
-    func updateBoardNumber(){
-        displayNumber.text = boadrNumber;
+    func updateBoard(){
+        displayNumber.text = boardNumber;
+        total.text = String(format: "Total: %d", Int(sum))
+        no.text = String(format: "No. %d", Int(count))
     }
     
     func reset(){
-         isFloatValue = false;
-         numberMode = NumberMode.FIRST_NUMBER;
-         boadrNumber = "0";
-         result = 0.0
-         input = 0.0
-         updateBoardNumber()
-         boadrNumber = "";
-        decimalPlace = 10.0
+        count = 1;
+        sum = 0;
+        boardNumber = "0"
+        updateBoard()
     }
+    
+
 
 }
 
